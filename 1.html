@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="./js/d3.7.6.1.js"></script>
+  </head>
+  <body>
+    <div id="root">
+      <svg width="700" height="700"></svg>
+    </div>
+    <script>
+      const margin = { top: 100, bottom: 100, right: 100, left: 100 };
+      let drag = d3.drag().on("drag", function (d) {
+        console.log(d);
+      });
+      let svg = d3.select("svg").call(drag);
+      let svgWidth = svg.attr("width");
+      let svgHeigt = svg.attr("height");
+
+      let innerWidth = svgWidth - margin.left - margin.right;
+      let innerHeight = svgHeigt - margin.top - margin.bottom;
+      let mainGroup = svg
+        .append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+      let data = [
+        {
+          name: "ttt",
+          age: 23,
+          color: "blue",
+        },
+        {
+          name: "tdtt",
+          age: 16,
+          color: "green",
+        },
+        {
+          name: "ttft",
+          age: 3,
+          color: "blue",
+        },
+        {
+          name: "ttqt",
+          age: 50,
+          color: "red",
+        },
+        {
+          name: "tretqt",
+          age: 19,
+          color: "red",
+        },
+        {
+          name: "ttqdt",
+          age: 45,
+          color: "red",
+        },
+        {
+          name: "t23tqt",
+          age: 20,
+          color: "red",
+        },
+      ];
+      let yScale = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, (d) => d.age) + 20])
+        .range([innerHeight, 0]);
+      let xScale = d3
+        .scaleBand()
+        .domain(data.map((d) => d.name))
+        .range([0, innerWidth])
+        .padding(0.6);
+
+      let yAxis = d3.axisLeft(yScale);
+      let xAxis = d3.axisBottom(xScale);
+      mainGroup
+        .append("g")
+        .call(xAxis)
+        .attr("transform", `translate(0, ${innerHeight})`);
+      mainGroup.append("g").call(yAxis);
+      let transition = d3.transition().duration(1000);
+      let texts = mainGroup
+        .append("g")
+        .selectAll("text")
+        .data(data)
+        .join("text")
+        .attr("x", (d) => xScale(d.name))
+        .attr("y", (d) => yScale(d.age))
+        .text((d) => d.age);
+
+      let rects = mainGroup
+        .selectAll("rect")
+        .data(data)
+        .join("rect")
+        .attr("width", xScale.bandwidth())
+        .attr("x", (d) => xScale(d.name))
+        .attr("y", (d) => yScale(d.age))
+        .attr("fill", (d) => d.color)
+        // .attr('transform', `translate(0 ${margin.top})`)
+        // .attr("transform", (d) => `translate(0 ${d3.max(data, (d) => d.age)})`)
+        .transition(transition)
+        .attr("height", (d) => innerHeight - yScale(d.age));
+      // .transition(transition);
+      // (async () => {
+      //   while (true) {
+      //     console.log(transition);
+      //     data.forEach((item) => (item.age = 50 * Math.random()));
+
+      //     rects.attr("width", (d) => xScale(d.age));
+      //     texts
+      //       .attr("y", (d) => yScale(d.name) + yScale.bandwidth() / 2 + 5)
+      //       .tween("text", function (d) {
+      //         let i = d3.interpolate(this.textContent, d.age);
+      //         return function (t) {
+      //           this.textContent = d3.format(".2f")(i(t));
+      //         };
+      //       })
+      //       .transition(transition)
+      //       .attr("x", (d) => xScale(d.age));
+      //     await transition.end();
+      //   }
+      // })();
+      console.log(xScale(30), xScale(10), yScale("ttt"), svgHeigt);
+    </script>
+  </body>
+</html>
